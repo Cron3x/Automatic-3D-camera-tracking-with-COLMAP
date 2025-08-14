@@ -13,16 +13,16 @@ Its importent to note that this script is currently written for *COLMAP 3.12.4*,
 first go to [COLMAP](https://github.com/colmap/colmap) and download the sourcecode of the latest release.
 In the folder you should create a folder called build and cd in to it.
 than run the following command
-```sh
+```bash
 cmake -S .. -B . -G Ninja
 ```
 you probably will get errors that libraries could not be found, so just go and install them.
 When this stepp is completed run 
-```sh
+```bash
 ninja
 ```
 now you can run:
-```sh
+```bash
 sudo ninja install
 ```
 to install the COLMAP binary
