@@ -27,7 +27,7 @@ sudo ninja install
 ```
 to install the COLMAP binary
 
-> [!TIP]
+> [!NOTE]
 > I'm on Fedora 42 and I had an error with conflicting Glog packages.
 > For me comenting out 'find_package(Glog ${COLMAP_FIND_TYPE})' in cmake/FindDependencies.cmake fixed the issue.
 > If there are anymore issues and fixes, let me know I will add them as well.
