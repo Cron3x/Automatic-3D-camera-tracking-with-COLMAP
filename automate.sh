@@ -5,17 +5,17 @@
 #   By polyfjord - https://youtube.com/polyfjord
 #   Linux version by Cron3x - https://github.com/cron3x
 #==================================================================
-##  USAGE
+##  USAGE TERMINAL
+#   All Folders can be set using the FOLDER LAYOUT name as
+#   enivronment variable or via commandline arguments
+#   (use -h or look at the cmd_usage string below)
+#
+##  USAGE double-click
 #     • Double-click this `.sh` or run it from a command prompt.
 #     • Frames are extracted, features matched, and a sparse
 #       reconstruction is produced automatically.
 #     • Videos that have already been processed are skipped on
 #       subsequent runs.
-#
-##  USAGE TERMINAL
-#   All Folders can be set using the FOLDER LAYOUT name as
-#   enivronment variable or via commandline arguments
-#   (use -h or look at the cmd_usage string below)
 #
 ##  PURPOSE
 #     This is a fully automated photogrammetry tracker for turning
