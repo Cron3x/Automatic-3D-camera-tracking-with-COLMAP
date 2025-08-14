@@ -6,8 +6,10 @@ This script is based on [this](https://gist.github.com/polyfjord/4ed7e8988bdb967
 I added a few extra features like disabling the GPU and changing the folder structure, just run the script with -h to see all option.
 Its importent to note that this script is currently written for *COLMAP 3.12.4*, some flags might change in the future
 
-## Building Colmap on Linux
+## Import into Blender
+[Import-Point-Cloud-Addon by SBCV](https://github.com/SBCV/Blender-Import-Point-Cloud-Addon)
 
+## Building Colmap on Linux
 first go to [COLMAP](https://github.com/colmap/colmap) and download the sourcecode of the latest release.
 In the folder you should create a folder called build and cd in to it.
 than run the following command
