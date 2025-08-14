@@ -4,7 +4,7 @@ A collection of scripts for automatic 3d camera tracking using COLMAP
 ## The script
 This script is based on [this](https://gist.github.com/polyfjord/4ed7e8988bdb9674145f1c270440200d) script from Polyfjord.
 I added a few extra features like disabling the GPU and changing the folder structure, just run the script with -h to see all option.
-Its importent to note that this script is currently written for COLMAP 3.12.4, some flags might change in the future
+Its importent to note that this script is currently written for *COLMAP 3.12.4*, some flags might change in the future
 
 ## Building Colmap on Linux
 
