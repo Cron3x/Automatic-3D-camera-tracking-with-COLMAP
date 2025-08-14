@@ -2,7 +2,7 @@
 
 #==================================================================
 ##  BATCH SCRIPT FOR AUTOMATED PHOTOGRAMMETRY TRACKING WORKFLOW
-#   By polyfjord - https://youtube.com/polyfjord
+#   Original by polyfjord - https://youtube.com/polyfjord
 #   Linux version by Cron3x - https://github.com/cron3x
 #==================================================================
 ##  USAGE TERMINAL
