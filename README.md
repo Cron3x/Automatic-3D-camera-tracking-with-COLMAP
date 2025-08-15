@@ -33,9 +33,9 @@ now you can run:
 sudo ninja install
 ```
 to install the COLMAP binary.
-If you I installed the binary you should provide the path to the binary when running the automate.sh script, eg.
+If you I installed the binary you should provide the path to the it when running the automate.sh script, eg.
 ```bash
-./automate.sh -C /use/local/bin/colmap
+./automate.sh -C /usr/local/bin/colmap
 ```
 
 
