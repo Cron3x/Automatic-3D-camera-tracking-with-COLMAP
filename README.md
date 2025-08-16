@@ -18,6 +18,8 @@ chmod -x <PATH-TO-SCRIPT>
 
 
 ## Colmap
+[Offical Installation Documentation](https://colmap.github.io/install.html)
+
 ### Prebuild Binaries
 Colmap can be installed via the homebrew package manager on Mac and Linux
 [Colmap on Homebrew](https://formulae.brew.sh/formula/colmap)
