@@ -16,7 +16,12 @@ chmod -x <PATH-TO-SCRIPT>
 ## Import into Blender
 [Import-Point-Cloud-Addon by SBCV](https://github.com/SBCV/Blender-Import-Point-Cloud-Addon)
 
-## Building Colmap on Linux
+## Colmap
+### Prebuild Binaries
+Colmap can be installed via the homebrew package manager on Mac and Linux
+(Colmap on Homebrew)[https://formulae.brew.sh/formula/colmap]
+
+### Building from Source
 first go to [COLMAP](https://github.com/colmap/colmap) and download the sourcecode of the latest release.
 In the folder you should create a folder called build and cd in to it.
 than run the following command
