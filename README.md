@@ -16,6 +16,7 @@ chmod -x <PATH-TO-SCRIPT>
 ## Import into Blender
 [Import-Point-Cloud-Addon by SBCV](https://github.com/SBCV/Blender-Import-Point-Cloud-Addon)
 
+
 ## Colmap
 ### Prebuild Binaries
 Colmap can be installed via the homebrew package manager on Mac and Linux
