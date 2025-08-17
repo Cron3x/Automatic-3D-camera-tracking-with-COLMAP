@@ -1,4 +1,4 @@
-# Automatic-3D-camera-tracking-with-COLMAP
+# Automatic 3D camera tracking with COLMAP on Linux (and Mac?)
 A collection of scripts for automatic 3d camera tracking using COLMAP
 
 ## The script
