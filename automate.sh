@@ -42,6 +42,23 @@
 #
 #==================================================================
 
+cmd_usage="
+ ARGUMENT     DESCRIPTION
+ -h           print this help
+ -c           set the working to the level of the shell
+              script instead of one folder above ( ./ instead of ../) 
+ -C           Set the the COLMAP executable   [Default: '../01 COLMAP/colmap' or '../01 COLMAP/bin/colmap']
+ -F           Set the the FFMPEG executable   [Default: '../03 FFMPEG/ffmpeg' or '../03 FFMPEG/bin/ffmpeg']
+ -V           Set the the VIDEOS directory    [Default: '../02 VIDEOS/']
+ -S           Set the the SCENES directory    [Default: '../04 SCENES/']
+ -j           Sets the amount of threads used by COLMAP   [Default: -1 (Use as many as possible)]
+ -cpu         Use the CPU instead of GPU      [Default: dependent on if the script could find CUDA]
+ -gpu         Force execution on GPU (CUDA). If you have it but the script does not find it.
+ -img-size    Change the image size, can reduce the RAM usage   [Default: 4096]
+ 
+ Defaults can also be found in the header of the script
+"
+
 #TODO: Replace old printf with custom functions, maybe introduce 'trap'
 # Also add multi error functionality
 #
@@ -73,22 +90,6 @@ fi
 # ---------- Resolve top-level folder (one up from this script) -----
 TOP="$(dirname "$(realpath "$0")")/.."
 
-cmd_usage="
- ARGUMENT     DESCRIPTION
- -h           print this help
- -c           set the working to the level of the shell
-              script instead of one folder above ( ./ instead of ../) 
- -C           Set the the COLMAP executable   [Default: '../01 COLMAP/colmap' or '../01 COLMAP/bin/colmap']
- -F           Set the the FFMPEG executable   [Default: '../03 FFMPEG/ffmpeg' or '../03 FFMPEG/bin/ffmpeg']
- -V           Set the the VIDEOS directory    [Default: '../02 VIDEOS/']
- -S           Set the the SCENES directory    [Default: '../04 SCENES/']
- -j           Sets the amount of threads used by COLMAP   [Default: -1 (Use as many as possible)]
- -cpu         Use the CPU instead of GPU      [Default: dependent on if the script could find CUDA]
- -gpu         Force execution on GPU (CUDA). If you have it but the script does not find it.
- -img-size    Change the image size, can reduce the RAM usage   [Default: 4096]
- 
- Defaults can also be found in the header of the script
-"
 #TODO: set working directory to be able to have one instsance of the script with multiple projects
 
 # ---------- Variables for COLMAP on CUDA ---------------------------
