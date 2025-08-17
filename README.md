@@ -21,8 +21,11 @@ chmod -x <PATH-TO-SCRIPT>
 [Offical Installation Documentation](https://colmap.github.io/install.html)
 
 ### Prebuild Binaries
-Colmap can be installed via the homebrew package manager on Mac and Linux
+Colmap can be installed via the [homebrew package manager](https://brew.sh/) on Mac and Linux
 [Colmap on Homebrew](https://formulae.brew.sh/formula/colmap)
+In my opinion this is the fastest way to set up colmap.
+
+Homebrew unfortunately reinstalls all dependencies need by colmap. What this mean is, you will have two instances of zlib, zstd, wayland and so on. This makes sense from the view of homebrew but is worth a consideration. On my system the homebrew folder grew to ~6gb, maybe I need to change something, but I couln'd find it easily.
 
 ### Building from Source
 first go to [COLMAP](https://github.com/colmap/colmap) and download the sourcecode of the latest release.
