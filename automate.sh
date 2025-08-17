@@ -41,86 +41,144 @@
 #
 #
 #==================================================================
-cmd_usage="
- ARGUMENT     DESCRIPTION
- -h           print this help
- -c           set the working to the level of the shell 
-              script instead of one folder above (./ instead of ../)
- -C           Set the the COLMAP executable
- -F           Set the the FFMPEG executable
- -V           Set the the VIDEOS directory
- -S           Set the the SCENES directory
- -cpu         Use the CPU instead of GPU (usefull if CUDA is not availabe)
- -img-size    Change the image size, can reduce the RAM usage [Default: 4096]
- 
- Defaults can be found in the header of the script
-"
+
+#TODO: Replace old printf with custom functions, maybe introduce 'trap'
+# Also add multi error functionality
+#
+ebye() {
+  printf "[ERROR] $1\n" >&2
+  exit 1
+}
+info() {
+  printf "[INFO] $1\n" >&1
+}
+
+# Get the Platform the script is running on
+PLATFORM="Unknown"
+case "$(uname -s)" in
+Linux*)
+  PLATFORM="Linux"
+  ;;
+Darwin*)
+  PLATFORM="macOS"
+  ;;
+esac
+
+if [[ "$PLATFORM" == "macOS" ]]; then
+  realpath() {
+    python3 -c "import os,sys; print(os.path.realpath(sys.argv[1]))" "$1"
+  }
+fi
 
 # ---------- Resolve top-level folder (one up from this script) -----
 TOP="$(dirname "$(realpath "$0")")/.."
 
+cmd_usage="
+ ARGUMENT     DESCRIPTION
+ -h           print this help
+ -c           set the working to the level of the shell
+              script instead of one folder above ( ./ instead of ../) 
+ -C           Set the the COLMAP executable   [Default: '../01 COLMAP/colmap' or '../01 COLMAP/bin/colmap']
+ -F           Set the the FFMPEG executable   [Default: '../03 FFMPEG/ffmpeg' or '../03 FFMPEG/bin/ffmpeg']
+ -V           Set the the VIDEOS directory    [Default: '../02 VIDEOS/']
+ -S           Set the the SCENES directory    [Default: '../04 SCENES/']
+ -j           Sets the amount of threads used by COLMAP   [Default: -1 (Use as many as possible)]
+ -cpu         Use the CPU instead of GPU      [Default: dependent on if the script could find CUDA]
+ -gpu         Force execution on GPU (CUDA). If you have it but the script does not find it.
+ -img-size    Change the image size, can reduce the RAM usage   [Default: 4096]
+ 
+ Defaults can also be found in the header of the script
+"
+#TODO: set working directory to be able to have one instsance of the script with multiple projects
+
 # ---------- Variables for COLMAP on CUDA ---------------------------
-USE_GPU=1
+USE_GPU=0
 IMG_SIZE=4096
+THREADS=$(nproc)
+
+# Check if cuda is available and gpu is working
+# TODO: test with ZLUDA
+if command -v nvidia-smi >/dev/null 2>&1; then
+  if nvidia-smi >/dev/null 2>&1; then
+    USE_GPU=1
+  fi
+fi
 
 # ---------- Handle Commandline args --------------------------------
 for option in "$@"; do
   case "$option" in
   -h)
-    echo "$cmd_usage"
+    printf "$cmd_usage\n"
     exit 0
     ;;
   -C)
     shift
     exe="$(realpath $1)"
-    echo "[INFO] Setting COLMAP executable to \`$exe\`"
+    printf "[INFO] Setting COLMAP executable to \`$exe\`\n"
     COLMAP="$exe"
     shift
     ;;
   -F)
     shift
     exe="$(realpath $1)"
-    echo "[INFO] Setting FFMPEG executable to \`$exe\`"
+    printf "[INFO] Setting FFMPEG executable to \`$exe\`\n"
     FFMPEG="$exe"
     shift
     ;;
   -V)
     shift
     dir="$(realpath "$1")"
-    echo "[INFO] Setting VIDEOS directory to \`$dir\`"
+    printf "[INFO] Setting VIDEOS directory to \`$dir\`\n"
     VIDEOS_DIR="$dir"
     shift
     ;;
   -S)
     shift
     dir="$(realpath $1)"
-    echo "[INFO] Setting SCENES directory to \`$dir\`"
+    printf "[INFO] Setting SCENES directory to \`$dir\`\n"
     SCENES_DIR="$dir"
+    shift
+    ;;
+  -j)
+    shift
+    #TODO: Does this need to do a number check + what happens if you provide more?
+    if [[ "$1" != -* ]]; then
+      THREADS="$1"
+    fi
+    printf "[INFO] COLMAP now uses $THREADS threads\n"
     shift
     ;;
   -c)
     TOP="$(dirname "$(realpath "$0")")"
-    echo "[INFO] Setting the working directory to \`$TOP\`"
+    printf "[INFO] Setting the working directory to \`$TOP\`\n"
     shift
     ;;
   -cpu)
     USE_GPU=0
-    if [[ USE_GPU -eq 0 ]]; then
-      echo "[INFO] Disabling the use of GPU for colmap"
-    else
-      echo "[INFO] Enabling the use of GPU for colmap (Can lead to problems on non CUDA cards - use $0 -h for help)"
-    fi
+    printf "[INFO] Forcing COLMAP to run on the CPU\n"
+    shift
+    ;;
+  -gpu)
+    USE_GPU=1
+    printf "[WARN] Forcing CUDA even though its doesn't seem to be supported - could couse errors\n"
     shift
     ;;
   -img-size)
     shift
     IMG_SIZE=$1
-    echo "[INFO] Setting the image size to \`$IMG_SIZE\`"
+    printf "[INFO] Setting the image size to \`$IMG_SIZE\`\n"
     shift
     ;;
   esac
 done
 shift $((OPTIND - 1))
+
+info "Detected Platform: $PLATFORM"
+if [[ USE_GPU -eq 1 ]]; then
+  info "COLMAP will run on the GPU"
+else
+  info "COLMAP will run on the CPU"
+fi
 
 # ---------- Key paths -------------------------------------------
 COLMAP_DIR="$TOP/01 COLMAP"
@@ -139,8 +197,7 @@ if [[ -z "$FFMPEG" ]]; then
   elif [[ -f "$FFMPEG_DIR/bin/ffmpeg" ]]; then
     FFMPEG="$FFMPEG_DIR/bin/ffmpeg"
   else
-    printf "[ERROR] ffmpeg not found inside \"$FFMPEG_DIR\"." >&2
-    exit 1
+    ebye "ffmpeg not found inside \"$FFMPEG_DIR\"."
   fi
 fi
 
@@ -151,15 +208,13 @@ if [[ -z "$COLMAP" ]]; then
   elif [[ -f "$COLMAP_DIR/bin/colmap" ]]; then
     COLMAP="$COLMAP_DIR/bin/colmap"
   else
-    printf "[ERROR] colmap not found inside \"$COLMAP_DIR\"." >&2
-    exit 1
+    ebye "colmap not found inside \"$COLMAP_DIR\"."
   fi
 fi
 
 # ---------- Ensure required folders exist ------------------------
 if [[ ! -d "$VIDEOS_DIR" ]]; then
-  printf "[ERROR] Input folder \"$VIDEOS_DIR\" missing." >&2
-  exit 1
+  ebye "Input folder \"$VIDEOS_DIR\" missing."
 fi
 
 if [[ ! -d "$VIDEOS_DIR" ]]; then
@@ -169,13 +224,13 @@ fi
 # ---------- Count videos for progress bar ------------------------
 TOTAL=$(find "$VIDEOS_DIR" -maxdepth 1 -type f | wc -l)
 if [[ "$TOTAL" -eq 0 ]]; then
-  printf "[WARNING] No video files found in \"$VIDEOS_DIR\"." >&2
+  printf "[WARNING] No video files found in \"$VIDEOS_DIR\".\n" >&2
   exit 1
 fi
 
-echo "=============================================================="
-echo " Starting COLMAP on $TOTAL video(s) ..."
-echo "=============================================================="
+printf "==============================================================\n"
+printf " Starting COLMAP on $TOTAL video(s) ...\n"
+printf "==============================================================\n"
 
 starting() {
   idx=0
@@ -187,16 +242,15 @@ starting() {
     fi
   done
 
-  echo "--------------------------------------------------------------"
-  echo " All jobs finished – results are in \"$SCENES_DIR\"."
-  echo "--------------------------------------------------------------"
+  printf "--------------------------------------------------------------\n"
+  printf " All jobs finished – results are in \"$SCENES_DIR\".\n"
+  printf "--------------------------------------------------------------\n"
 }
 
 new_dir() {
   mkdir -p "$1"
   if [ $? -ne 0 ]; then
-    printf "[ERROR] Failed to create directories: $1" >&2
-    exit 1
+    ebye "Failed to create directories: $1"
   fi
 }
 
@@ -212,8 +266,7 @@ process_video() {
   EXT="${BASE##*.}"
   BASE="${BASE%.*}"
 
-  echo
-  echo "[$NUM/$TOT] === Processing \"$BASE.$EXT\" ==="
+  printf "[$NUM/$TOT] === Processing \"$BASE.$EXT\" ===\n"
 
   # -------- Directory layout for this scene -----------------------
   SCENE="$SCENES_DIR/$BASE"
@@ -222,7 +275,7 @@ process_video() {
 
   # -------- Skip if already reconstructed -------------------------
   if [ -f "$SCENE/database.db" ]; then
-    echo "        ↻ Skipping \"$BASE\" – already reconstructed."
+    printf "        ↻ Skipping \"$BASE\" – already reconstructed.\n"
     return
   fi
 
@@ -231,21 +284,21 @@ process_video() {
   new_dir "$SPARSE_DIR"
 
   # -------- 1) Extract every frame --------------------------------
-  echo "        [1/4] Extracting frames ..."
+  printf "        [1/4] Extracting frames ...\n"
   "$FFMPEG" -loglevel error -stats -i "$VIDEO" -qscale:v 2 "$IMG_DIR/frame_%06d.jpg"
   if [ $? -ne 0 ]; then
-    echo "        ✖ FFmpeg failed – skipping \"$BASE\"."
+    printf "        ✖ FFmpeg failed – skipping \"$BASE\".\n"
     return
   fi
 
   # Check at least one frame exists
   if [ ! "$(ls -A "$IMG_DIR"/*.jpg 2>/dev/null)" ]; then
-    echo "        ✖ No frames extracted – skipping \"$BASE\"."
+    printf "        ✖ No frames extracted – skipping \"$BASE\".\n"
     return
   fi
 
   # -------- 2) Feature extraction ---------------------------------
-  echo "        [2/4] COLMAP feature_extractor ..."
+  printf "        [2/4] COLMAP feature_extractor ...\n"
   "$COLMAP" feature_extractor \
     --ImageReader.single_camera 1 \
     --SiftExtraction.max_image_size $IMG_SIZE \
@@ -253,32 +306,32 @@ process_video() {
     --database_path "$SCENE/database.db" \
     --image_path "$IMG_DIR"
   if [ $? -ne 0 ]; then
-    echo "        ✖ feature_extractor failed – skipping \"$BASE\"."
-    echo "            try using -cpu or reduce the image size via -image-size"
+    printf "        ✖ feature_extractor failed – skipping \"$BASE\".\n"
+    printf "          try using -cpu or reduce the image size via -image-size\n"
     return
   fi
 
   # -------- 3) Sequential matching --------------------------------
-  echo "        [3/4] COLMAP sequential_matcher ..."
+  printf "        [3/4] COLMAP sequential_matcher ...\n"
   "$COLMAP" sequential_matcher \
     --SiftMatching.use_gpu $USE_GPU \
     --database_path "$SCENE/database.db" \
     --SequentialMatching.overlap 15
   if [ $? -ne 0 ]; then
-    echo "        ✖ sequential_matcher failed – skipping \"$BASE\"."
+    printf "        ✖ sequential_matcher failed – skipping \"$BASE\".\n"
     return
   fi
 
   # -------- 4) Sparse reconstruction ------------------------------
-  echo "        [4/4] COLMAP mapper ..."
+  printf "        [4/4] COLMAP mapper ...\n"
   "$COLMAP" mapper \
-    --Mapper.num_threads "$(nproc)" \
+    --Mapper.num_threads "$THREADS" \
     --Mapper.ba_use_gp $USE_GPU \
     --database_path "$SCENE/database.db" \
     --image_path "$IMG_DIR" \
     --output_path "$SPARSE_DIR"
   if [ $? -ne 0 ]; then
-    echo "        ✖ mapper failed – skipping \"$BASE\"."
+    printf "        ✖ mapper failed – skipping \"$BASE\".\n"
     return
   fi
 
@@ -290,7 +343,7 @@ process_video() {
       --output_type TXT >/dev/null
   fi
 
-  echo "        ✔ Finished \"$BASE\"  ($NUM/$TOT)"
+  printf "        ✔ Finished \"$BASE\"  ($NUM/$TOT)\n"
 }
 
 starting
