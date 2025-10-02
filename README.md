@@ -29,9 +29,11 @@ Homebrew unfortunately reinstalls all dependencies need by colmap. What this mea
 
 ### Building from Source
 first go to [COLMAP](https://github.com/colmap/colmap) and download the sourcecode of the latest release.
-In the folder you should create a folder called build and cd in to it.
+In the folder you should create a folder called `build` and cd in to it.
 than run the following command
 ```bash
+mkdir build
+cd ./build/
 cmake -S .. -B . -G Ninja
 ```
 you probably will get errors that libraries could not be found, so just go and install them.
