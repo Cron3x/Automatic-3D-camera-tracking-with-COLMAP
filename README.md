@@ -28,6 +28,10 @@ In my opinion this is the fastest way to set up colmap.
 Homebrew unfortunately reinstalls all dependencies need by colmap. What this mean is, you will have two instances of zlib, zstd, wayland and so on. This makes sense from the view of homebrew but is worth a consideration. On my system the homebrew folder grew to ~6gb, maybe I need to change something, but I couln'd find it easily.
 
 ### Building from Source
+#### VCPKG
+[Its basically the same as in Glomap](#Glomap)
+
+#### Download everything your self
 first go to [COLMAP](https://github.com/colmap/colmap) and download the sourcecode of the latest release.
 In the folder you should create a folder called `build` and cd in to it.
 than run the following command
