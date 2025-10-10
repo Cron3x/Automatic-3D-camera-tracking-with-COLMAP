@@ -29,7 +29,7 @@ Homebrew unfortunately reinstalls all dependencies need by colmap. What this mea
 
 ### Building from Source
 #### VCPKG
-[Its basically the same as in Glomap](#Glomap)
+[Offical Installation Documentation](https://colmap.github.io/install.html)
 
 #### Download everything your self
 first go to [COLMAP](https://github.com/colmap/colmap) and download the sourcecode of the latest release.
