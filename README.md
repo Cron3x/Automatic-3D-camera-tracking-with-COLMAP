@@ -6,7 +6,7 @@ This script is based on [this](https://gist.github.com/polyfjord/4ed7e8988bdb967
 
 I added a few extra features like disabling the GPU and changing the folder structure, just run the script with -h to see all option.
 
-Its importent to note that this script is currently written for *COLMAP 3.12.4*, some features might change in the future so functionality can not be guaranteed. (Some flags already hav changed in the main branch)
+Its importent to note that this script is currently written for *COLMAP 3.12.4*, some features might change in the future so functionality can not be guaranteed. (Some flags already have changed in the main branch)
 
 Before you can use the script you need to kae it executable with:
 ```bash
