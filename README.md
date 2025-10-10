@@ -8,7 +8,8 @@ I added a few extra features like disabling the GPU and changing the folder stru
 
 Its importent to note that this script is currently written for *COLMAP 3.12.6*, some features might change in the future so functionality can not be guaranteed.
 Older versions of the script can be found in the release section
-- 1.0.0: Colmap 3.12.4 (no glomap)
+- v1.1.0: Colmap 3.12.6 + Glomap 1.1.0
+- v1.0.0: Colmap 3.12.4 (no glomap)
 
 Before you can use the script you need to kae it executable with:
 ```bash
