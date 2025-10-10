@@ -52,6 +52,7 @@ cmd_usage="
  -V           Set the the VIDEOS directory    [Default: '../02 VIDEOS/']
  -S           Set the the SCENES directory    [Default: '../04 SCENES/']
  -j           Sets the amount of threads used by COLMAP   [Default: -1 (Use as many as possible)]
+ -G           Use Glowmap as mapper
  -cpu         Use the CPU instead of GPU      [Default: dependent on if the script could find CUDA]
  -gpu         Force execution on GPU (CUDA). If you have it but the script does not find it.
  -img-size    Change the image size, can reduce the RAM usage   [Default: 4096]
@@ -154,6 +155,13 @@ for option in "$@"; do
     printf "[INFO] Setting the working directory to \`$TOP\`\n"
     shift
     ;;
+  -G)
+    shift
+    exe="$(realpath $1)"
+    printf "[INFO] Enabeling Glowmap\n"
+    GLOMAP="$exe"
+    shift
+    ;;
   -cpu)
     USE_GPU=0
     printf "[INFO] Forcing COLMAP to run on the CPU\n"
@@ -243,9 +251,9 @@ starting() {
     fi
   done
 
-  printf "--------------------------------------------------------------\n"
+  printf "==============================================================\n"
   printf " All jobs finished – results are in \"$SCENES_DIR\".\n"
-  printf "--------------------------------------------------------------\n"
+  printf "==============================================================\n"
 }
 
 new_dir() {
@@ -303,7 +311,8 @@ process_video() {
   "$COLMAP" feature_extractor \
     --ImageReader.single_camera 1 \
     --SiftExtraction.max_image_size $IMG_SIZE \
-    --SiftExtraction.use_gpu $USE_GPU \
+    --FeatureExtraction.gpu_index 1 \
+    --FeatureExtraction.use_gpu $USE_GPU \
     --database_path "$SCENE/database.db" \
     --image_path "$IMG_DIR"
   if [ $? -ne 0 ]; then
@@ -325,7 +334,11 @@ process_video() {
 
   # -------- 4) Sparse reconstruction ------------------------------
   printf "        [4/4] COLMAP mapper ...\n"
-  "$COLMAP" mapper \
+  MAPPER="$COLMAP"
+  if [ -z GLOMAP ]; then
+    MAPPER="$GLOMAP"
+  fi
+  "$MAPPER" mapper \
     --Mapper.num_threads "$THREADS" \
     --Mapper.ba_use_gp $USE_GPU \
     --database_path "$SCENE/database.db" \
