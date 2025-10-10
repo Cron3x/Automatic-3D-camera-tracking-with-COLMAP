@@ -31,6 +31,10 @@ Homebrew unfortunately reinstalls all dependencies need by colmap. What this mea
 #### VCPKG
 [Offical Installation Documentation](https://colmap.github.io/install.html)
 
+>[!NOTE]
+>Packages Reured:
+>  Fedora: `perl-FindBin`, `autoconf`, `automake` and `libtool`
+
 #### Download everything your self
 first go to [COLMAP](https://github.com/colmap/colmap) and download the sourcecode of the latest release.
 In the folder you should create a folder called `build` and cd in to it.
