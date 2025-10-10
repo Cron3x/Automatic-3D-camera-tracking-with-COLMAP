@@ -1,4 +1,4 @@
-# Automatic 3D camera tracking with COLMAP on Linux (and Mac?)
+# Automatic 3D camera tracking with COLMAP and GLOMAP on Linux (and Mac?)
 A collection of scripts for automatic 3d camera tracking using COLMAP
 
 ## The script
@@ -56,3 +56,39 @@ If you I installed the binary you should provide the path to the it when running
 > I'm on Fedora 42 and I had an error with conflicting Glog packages.
 > For me comenting out 'find_package(Glog ${COLMAP_FIND_TYPE})' in cmake/FindDependencies.cmake fixed the issue.
 > If there are anymore issues and fixes, let me know I will add them as well.
+
+
+# Glomap
+[COLMAP](https://github.com/colmap/glomap)
+I had success compiling it on Fedora using `vcpkg` and the latest git version.
+
+These are my installation steps
+
+```bash
+git clone https://github.com/colmap/glomap.git
+cd glomap
+git clone --depth=1 https://github.com/Microsoft/vcpkg.git
+./vcpkg/bootstrap-vcpkg.sh  -disableMetrics
+```
+
+If you want to get the latest version of colmap or dont want to compile against your local version you should remove `FETCH_COLMAP="OFF"`.
+
+```sh
+FETCH_COLMAP="OFF" cmake -B build -GNinja \
+  -DCMAKE_TOOLCHAIN_FILE=./vcpkg/scripts/buildsystems/vcpkg.cmake \
+  -DCMAKE_CUDA_ARCHITECTURES=native \
+  -DCMAKE_CXX_FLAGS="-Wno-error"
+```
+ > [!NOTE]
+ > You might want to install the `autoconf`, `automake` and `libtool` packages if you encouter errors.
+
+For me the ninja compilation crashed because the -Werror for C++ was set. My workaround is to go into buld.ninja and remove it from every line.
+If you now how to change the default please let me know. Also it tried to compile against CUDA eventhough I don't hava a NVIDIA GPU, the fix for me was to change the if statment in the CMakeLists.txt
+
+```sh
+cd build
+
+ninja
+
+sudo ninja install
+```
