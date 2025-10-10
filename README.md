@@ -63,7 +63,8 @@ If you I installed the binary you should provide the path to the it when running
 
 
 # Glomap
-[COLMAP](https://github.com/colmap/glomap)
+[GLOMAP Source](https://github.com/colmap/glomap)
+</br>
 I had success compiling it on Fedora using `vcpkg` and the latest git version.
 
 These are my installation steps
