@@ -56,6 +56,7 @@ cmd_usage="
  -cpu         Use the CPU instead of GPU      [Default: dependent on if the script could find CUDA]
  -gpu         Force execution on GPU (CUDA). If you have it but the script does not find it.
  -img-size    Change the image size, can reduce the RAM usage   [Default: 4096]
+ -libs        set LD_LIBRARY_PATH for the COLMAP executable
  
  Defaults can also be found in the header of the script
 "
@@ -176,6 +177,12 @@ for option in "$@"; do
     shift
     IMG_SIZE=$1
     printf "[INFO] Setting the image size to \`$IMG_SIZE\`\n"
+    shift
+    ;;
+  -libs)
+    shift
+    LD_LIBRARIES=$1
+    printf "[INFO] Setting Colmap LD_LIBRARY_PATH \`$LD_LIBRARIES\`\n"
     shift
     ;;
   esac
@@ -308,7 +315,8 @@ process_video() {
 
   # -------- 2) Feature extraction ---------------------------------
   printf "        [2/4] COLMAP feature_extractor ...\n"
-  "$COLMAP" feature_extractor \
+  printf "\t libs: $LD_LIBRARIES \n"
+  LD_LIBRARY_PATH=$LD_LIBRARIES "$COLMAP" feature_extractor \
     --ImageReader.single_camera 1 \
     --SiftExtraction.max_image_size $IMG_SIZE \
     --FeatureExtraction.gpu_index 1 \
@@ -323,8 +331,8 @@ process_video() {
 
   # -------- 3) Sequential matching --------------------------------
   printf "        [3/4] COLMAP sequential_matcher ...\n"
-  "$COLMAP" sequential_matcher \
-    --SiftMatching.use_gpu $USE_GPU \
+  LD_LIBRARY_PATH=$LD_LIBRARIES "$COLMAP" sequential_matcher \
+    --FeatureMatching.use_gpu $USE_GPU \
     --database_path "$SCENE/database.db" \
     --SequentialMatching.overlap 15
   if [ $? -ne 0 ]; then
@@ -335,12 +343,13 @@ process_video() {
   # -------- 4) Sparse reconstruction ------------------------------
   printf "        [4/4] COLMAP mapper ...\n"
   MAPPER="$COLMAP"
-  if [ -z GLOMAP ]; then
+  if [ -n "$GLOMAP" ]; then
     MAPPER="$GLOMAP"
   fi
-  "$MAPPER" mapper \
+  printf "+> $SCENE\n+> $IMG_DIR"
+  LD_LIBRARY_PATH=$LD_LIBRARIES "$MAPPER" mapper \
     --Mapper.num_threads "$THREADS" \
-    --Mapper.ba_use_gp $USE_GPU \
+    --Mapper.ba_use_gpu $USE_GPU \
     --database_path "$SCENE/database.db" \
     --image_path "$IMG_DIR" \
     --output_path "$SPARSE_DIR"
@@ -351,7 +360,7 @@ process_video() {
 
   # -------- Export best model to TXT ------------------------------
   if [ -d "$SPARSE_DIR/0" ]; then
-    "$COLMAP" model_converter \
+    LD_LIBRARY_PATH=$LD_LIBRARIES "$COLMAP" model_converter \
       --input_path "$SPARSE_DIR/0" \
       --output_path "$SPARSE_DIR" \
       --output_type TXT >/dev/null
