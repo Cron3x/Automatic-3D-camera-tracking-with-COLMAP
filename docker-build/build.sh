@@ -6,7 +6,7 @@ TITLE=""
 if [ "$1" = "-cuda" ]; then
   TARGET="target-cuda"
   USE_CUDA=1
-  TITLE="cuda"
+  TITLE="-cuda"
 fi
 
 if [ -d "$TARGET" ]; then
@@ -14,8 +14,8 @@ if [ -d "$TARGET" ]; then
 fi
 
 mkdir "$TARGET/"
-docker build --build-arg USE_CUDA="$USE_CUDA" -t colmap-builder-cu-$TITLE .
-docker run -u 0 -v "$(pwd)/$TARGET":"/out":Z "colmap-builder-cu-$TITLE" \
+docker build --build-arg USE_CUDA="$USE_CUDA" -t colmap-builder$TITLE .
+docker run -u 0 -v "$(pwd)/$TARGET":"/out":Z "colmap-builder$TITLE" \
   sh -c '
 cp /home/ubuntu/glomap-1.2.0/build/glomap/glomap /out/ ; \
 cp /home/ubuntu/colmap-3.13.0/build/src/colmap/exe/colmap /out ; \
