@@ -21,6 +21,8 @@ Before you can use the script you need to kae it executable with:
 chmod -x <PATH-TO-SCRIPT>
 ```
 
+The releases contain a compiled version of comlap and glomap.
+
 ## Import into Blender
 
 [Import-Point-Cloud-Addon by SBCV](https://github.com/SBCV/Blender-Import-Point-Cloud-Addon)
